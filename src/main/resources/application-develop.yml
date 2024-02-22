@@ -2,6 +2,9 @@ server:
   port: 8080
 
 spring:
+  config:
+    activate:
+      on-profile: develop
   webflux:
     base-path: /concurrence-control/v1
   datasource:
@@ -10,11 +13,3 @@ spring:
     password: "12345678"
   jpa:
     database-platform: "org.hibernate.dialect.MySQLDialect"
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: "true"
-    defer-datasource-initialization: true
-  sql:
-    init:
-      mode: "always"
