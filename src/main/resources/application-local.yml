@@ -8,11 +8,11 @@ spring:
   webflux:
     base-path: /concurrence-control/v1
   datasource:
-    url: "jdbc:mysql://localhost:3306/bank?createDatabaseIfNotExist=true&serverTimezone=UTC&useSSl=false"
-    username: "root"
+    url: "jdbc:postgresql://localhost:5433/bank"
+    username: "postgres"
     password: "12345678"
   jpa:
-    database-platform: "org.hibernate.dialect.MySQLDialect"
+    database-platform: "org.hibernate.dialect.PostgreSQLDialect"
     show-sql: true
     properties:
       hibernate:
