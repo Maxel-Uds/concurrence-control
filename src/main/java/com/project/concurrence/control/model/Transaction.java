@@ -3,10 +3,7 @@ package com.project.concurrence.control.model;
 import com.project.concurrence.control.controller.requests.CreateTransactionRequest;
 import com.project.concurrence.control.model.enums.TransactionType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -14,18 +11,17 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import java.time.LocalDateTime;
 
 @Entity
+@Setter
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = true)
 @Table(name = "transactions")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    private User user;
+    private Long userId;
     private Long valor;
     private String descricao;
     @Enumerated(EnumType.STRING)
@@ -33,12 +29,22 @@ public class Transaction {
     @Column(insertable = false)
     private LocalDateTime criadoEm;
 
+    public Transaction copyWithId(final Long id) {
+        return Transaction.builder()
+                .id(id)
+                .userId(this.userId)
+                .valor(this.valor)
+                .descricao(this.descricao)
+                .tipo(this.tipo)
+                .build();
+    }
+
     public static Transaction toEntity(final CreateTransactionRequest request, final User user) {
         return Transaction.builder()
-                .user(user)
+                .userId(user.getId())
                 .valor(request.getValor())
                 .descricao(request.getDescricao())
-                .tipo(request.getTipo())
+                .tipo(TransactionType.valueOf(request.getTipo()))
                 .build();
     }
 

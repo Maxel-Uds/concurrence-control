@@ -5,11 +5,10 @@ spring:
   config:
     activate:
       on-profile: develop
-  webflux:
-    base-path: /concurrence-control/v1
   datasource:
-    url: "jdbc:postgresql://db_postgres:5432/bank"
-    username: "postgres"
-    password: "12345678"
-  jpa:
-    database-platform: "org.hibernate.dialect.PostgreSQLDialect"
+    url: ${POSTGRES_DB_URL}
+    username: ${POSTGRES_DB_USER}
+    password: ${POSTGRES_DB_PASS}
+    driver: "org.postgresql.Driver"
+    hikari:
+      maximum-pool-size: 10

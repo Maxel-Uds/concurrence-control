@@ -1,13 +1,10 @@
 package com.project.concurrence.control.repository;
 
 import com.project.concurrence.control.model.Transaction;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
-
-@Repository
-public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-
-    List<Transaction> findByUserId(Long userId);
+public interface TransactionRepository {
+    Flux<Transaction> findAllByUserId(final Long userId);
+    Mono<Transaction> save(final Transaction transaction);
 }

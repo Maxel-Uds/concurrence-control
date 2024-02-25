@@ -11,12 +11,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 @Entity
-@Builder
 @Getter
 @Setter
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-@Accessors(chain = true)
+@AllArgsConstructor
 @Table(name = "users")
 public class User {
     @Id
@@ -24,6 +23,14 @@ public class User {
     private Long id;
     private Long saldo;
     private Long limite;
+
+    public User copyWithSaldo(final Long amount) {
+        return User.builder()
+                .id(this.id)
+                .saldo(amount)
+                .limite(this.limite)
+                .build();
+    }
 
     @Override
     public String toString() {
