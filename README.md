@@ -1,4 +1,4 @@
-## Estudo de caso sobre controle de recorrência
+## Estudo de caso sobre controle de concorrência
 
 Projeto que simula um sistema bancário onde ocorrem débitos e créditos 
 às contas dos clientes.
