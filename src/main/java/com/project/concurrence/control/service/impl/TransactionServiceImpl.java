@@ -66,12 +66,22 @@ public class TransactionServiceImpl implements TransactionService {
         return Mono.defer(() -> {
             return switch (TransactionType.valueOf(request.getTipo())) {
                 case c -> Mono.just(request.getValor());
-                case d -> Mono.just(-request.getValor());
+                case d -> calculateDebit(user, request);
             };
         });
     }
 
+    private Mono<Long> calculateDebit(final User user, final CreateTransactionRequest request) {
+        if(user.getSaldo() - request.getValor() < user.getLimite() * -1 ) {
+            return Mono.error(new InvalidTransactionException(
+                    "Saldo insuficiente",
+                    HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                    HttpStatus.UNPROCESSABLE_ENTITY
+            ));
+        }
 
+        return Mono.just(-request.getValor());
+    }
 
 //    private Mono<Long> calculateTransactionAmount(final User user, final CreateTransactionRequest request) {
 //        if(TransactionType.d.name().equals(request.getTipo()) && user.getSaldo() + user.getLimite() < request.getValor()) {
