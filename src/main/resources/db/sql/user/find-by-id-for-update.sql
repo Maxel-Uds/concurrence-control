@@ -1,5 +1,5 @@
 SELECT
-    pg_advisory_xact_lock(:userId),
+--    pg_advisory_xact_lock(:userId),
     id,
     saldo,
     limite

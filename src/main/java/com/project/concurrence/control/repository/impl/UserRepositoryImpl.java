@@ -38,14 +38,18 @@ public class UserRepositoryImpl extends BaseRepository implements UserRepository
     }
 
     @Override
-    public Mono<User> updateUser(final User user) {
-        return async(() -> jdbi.inTransaction(handle -> {
-            handle.createUpdate(locateSql("update-user"))
-                    .bind("userId", user.getId())
-                    .bind("saldo", user.getSaldo())
-                    .execute();
+    public Mono<User> updateUser(final User user, final Long amount) {
+        return async(() -> {
+                    return jdbi.inTransaction(handle ->
+                            handle.createUpdate(locateSql("update-user"))
+                                    .bind("userId", user.getId())
+                                    .bind("transactionValue", amount)
+                                    .executeAndReturnGeneratedKeys("saldo")
+                                    .mapTo(Long.class)
+                                    .one()
+                    );
+                }
 
-            return user;
-        }));
+        ).map(user::copyWithSaldo);
     }
 }

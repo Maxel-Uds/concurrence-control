@@ -6,6 +6,7 @@ import com.project.concurrence.control.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -30,8 +31,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<User> updateUser(User user) {
-        return this.repository.updateUser(user)
+    public Mono<User> updateUser(final User user, final Long amount) {
+        return this.repository.updateUser(user, amount)
                 .doOnSuccess(resp -> log.info("=== Usuário atualizado com sucesso [{}]", user))
                 .doOnError(throwable -> log.info("=== Erro ao atualizar usuário: [{}]", throwable.getMessage()))
                 .doFirst(() -> log.info("=== Atualizando usúario [{}]", user));

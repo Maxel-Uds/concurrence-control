@@ -5,6 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface UserService {
     Mono<User> findById(final Long id);
-    Mono<User> updateUser(final User user);
+    Mono<User> updateUser(final User user, final Long amount);
     Mono<User> findUserByIdToUpdateBalance(final Long id);
 }

@@ -23,12 +23,14 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
+    private static final Long DEBIT_OPERATION = -1L;
+
     private final UserService userService;
     private final TransactionRepository transactionRepository;
 
     @Override
     @Transactional
-//    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     public Mono<CreateTransactionResponse> createTransaction(final CreateTransactionRequest request, final Long id) {
         return this.userService.findUserByIdToUpdateBalance(id)
                 .switchIfEmpty(Mono.defer(() -> Mono.error(
@@ -39,13 +41,14 @@ public class TransactionServiceImpl implements TransactionService {
                         )))
                 )
                 .zipWhen(user -> this.calculateTransactionAmount(user, request))
-                .flatMap(userAndAmount -> this.userService.updateUser(userAndAmount.getT1().copyWithSaldo(userAndAmount.getT2())))
+                .flatMap(userAndAmount -> this.userService.updateUser(userAndAmount.getT1(), userAndAmount.getT2()))
                 .flatMap(user -> this.transactionRepository.save(Transaction.toEntity(request, user)).thenReturn(user))
                 .map(CreateTransactionResponse::of);
     }
 
     @Override
     @Transactional
+//    @Lock(LockModeType.PESSIMISTIC_WRITE)
     public Mono<TransactionHistoricResponse> getBankStatements(Long id) {
         return this.userService.findById(id)
                 .switchIfEmpty(Mono.defer(() -> Mono.error(
@@ -62,29 +65,17 @@ public class TransactionServiceImpl implements TransactionService {
                 ));
     }
 
-    private Mono<Long> calculateTransactionAmount(final User user, final CreateTransactionRequest request) {
-        return Mono.defer(() -> {
-            return switch (TransactionType.valueOf(request.getTipo())) {
-                case c -> Mono.just(user.getSaldo() + request.getValor());
-                case d -> calculateDebit(user, request);
-            };
-        });
-    }
-
-    private Mono<Long> calculateDebit(final User user, final CreateTransactionRequest request) {
-        if(user.getSaldo() + user.getLimite() < request.getValor()) {
-            return Mono.error(new InvalidTransactionException(
-                    "Saldo insuficiente",
-                    HttpStatus.UNPROCESSABLE_ENTITY.value(),
-                    HttpStatus.UNPROCESSABLE_ENTITY
-            ));
-        }
-
-        return Mono.just(user.getSaldo() - request.getValor());
-    }
-
 //    private Mono<Long> calculateTransactionAmount(final User user, final CreateTransactionRequest request) {
-//        if(TransactionType.d.name().equals(request.getTipo()) && user.getSaldo() + user.getLimite() < request.getValor()) {
+//        return Mono.defer(() -> {
+//            return switch (TransactionType.valueOf(request.getTipo())) {
+//                case c -> Mono.just(request.getValor());
+//                case d -> calculateDebit(user, request);
+//            };
+//        });
+//    }
+//
+//    private Mono<Long> calculateDebit(final User user, final CreateTransactionRequest request) {
+//        if(user.getSaldo() + user.getLimite() < request.getValor()) {
 //            return Mono.error(new InvalidTransactionException(
 //                    "Saldo insuficiente",
 //                    HttpStatus.UNPROCESSABLE_ENTITY.value(),
@@ -92,6 +83,18 @@ public class TransactionServiceImpl implements TransactionService {
 //            ));
 //        }
 //
-//        return TransactionType.d.name().equals(request.getTipo()) ? Mono.just(user.getSaldo() - request.getValor()) : Mono.just(user.getSaldo() + request.getValor());
+//        return Mono.just(DEBIT_OPERATION * request.getValor());
 //    }
+
+    private Mono<Long> calculateTransactionAmount(final User user, final CreateTransactionRequest request) {
+        if(TransactionType.d.name().equals(request.getTipo()) && user.getSaldo() + user.getLimite() < request.getValor()) {
+            return Mono.error(new InvalidTransactionException(
+                    "Saldo insuficiente",
+                    HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                    HttpStatus.UNPROCESSABLE_ENTITY
+            ));
+        }
+
+        return TransactionType.d.name().equals(request.getTipo()) ? Mono.just(DEBIT_OPERATION * request.getValor()) : Mono.just(request.getValor());
+    }
 }
