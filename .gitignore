@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Teste de Stress ###
+load-test/user-files/results
