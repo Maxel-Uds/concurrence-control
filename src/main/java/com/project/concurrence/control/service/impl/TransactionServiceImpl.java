@@ -3,22 +3,24 @@ package com.project.concurrence.control.service.impl;
 import com.project.concurrence.control.controller.requests.CreateTransactionRequest;
 import com.project.concurrence.control.controller.responses.CreateTransactionResponse;
 import com.project.concurrence.control.controller.responses.TransactionHistoricResponse;
+import com.project.concurrence.control.controller.responses.TransactionResponse;
 import com.project.concurrence.control.exception.InvalidTransactionException;
-import com.project.concurrence.control.exception.UserNotFoundException;
 import com.project.concurrence.control.model.Transaction;
 import com.project.concurrence.control.model.User;
 import com.project.concurrence.control.model.enums.TransactionType;
 import com.project.concurrence.control.repository.TransactionRepository;
 import com.project.concurrence.control.service.TransactionService;
 import com.project.concurrence.control.service.UserService;
-import jakarta.persistence.LockModeType;
 import lombok.AllArgsConstructor;
-import org.springframework.data.jpa.repository.Lock;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
+@Slf4j
 @Service
 @AllArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
@@ -28,73 +30,48 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserService userService;
     private final TransactionRepository transactionRepository;
 
-    @Override
-    @Transactional
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public Mono<CreateTransactionResponse> createTransaction(final CreateTransactionRequest request, final Long id) {
-        return this.userService.findUserByIdToUpdateBalance(id)
-                .switchIfEmpty(Mono.defer(() -> Mono.error(
-                        new UserNotFoundException(
-                                String.format("Nenhum usuário encontrado com o id [%s]", id),
-                                HttpStatus.NOT_FOUND.value(),
-                                HttpStatus.NOT_FOUND
-                        )))
-                )
-                .zipWhen(user -> this.calculateTransactionAmount(user, request))
-                .flatMap(userAndAmount -> this.userService.updateUser(userAndAmount.getT1(), userAndAmount.getT2()))
-                .flatMap(user -> this.transactionRepository.save(Transaction.toEntity(request, user)).thenReturn(user))
-                .map(CreateTransactionResponse::of);
+
+    public Mono<TransactionHistoricResponse> getTransactionHistoric(Long id) {
+        User user = this.userService.findById(id);
+
+        log.info("==== Buscando extrato do user [{}]", id);
+        List<TransactionResponse> transactions = this.transactionRepository.findTop10ByUserIdOrderByCriadoEmDesc(id)
+                .stream().map(TransactionResponse::of).toList();
+
+        log.info("==== Extrato encontrado {}", transactions);
+        return Mono.just(TransactionHistoricResponse.of(user, transactions));
     }
 
-    @Override
     @Transactional
-//    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public Mono<TransactionHistoricResponse> getBankStatements(Long id) {
-        return this.userService.findById(id)
-                .switchIfEmpty(Mono.defer(() -> Mono.error(
-                        new UserNotFoundException(
-                                String.format("Nenhum usuário encontrado com o id [%s]", id),
-                                HttpStatus.NOT_FOUND.value(),
-                                HttpStatus.NOT_FOUND
-                        )))
-                )
-                .flatMap(user ->
-                        this.transactionRepository.findAllByUserId(user.getId())
-                            .collectList()
-                            .map(transactions -> TransactionHistoricResponse.of(user, transactions)
-                ));
+    public Mono<CreateTransactionResponse> createTransaction(Long id, CreateTransactionRequest request) {
+        User user = this.userService.findUserByIdToUpdateBalance(id);
+
+        if(request.getTipo().equals(TransactionType.d.name())) this.validBalanceToDebitTransaction(user, request);
+
+        Long newUserBalance = calculateNewUserBalance(user, request);
+
+        log.info("==== Salvando transação [{}] do usuário [{}]", request, user.getId());
+        transactionRepository.save(Transaction.toEntity(request, user));
+
+        User updatedUser = userService.updateUser(user.copyWithNewBalance(newUserBalance));
+
+        log.info("==== Transação realizada com sucesso");
+        return Mono.just(CreateTransactionResponse.of(updatedUser));
     }
 
-//    private Mono<Long> calculateTransactionAmount(final User user, final CreateTransactionRequest request) {
-//        return Mono.defer(() -> {
-//            return switch (TransactionType.valueOf(request.getTipo())) {
-//                case c -> Mono.just(request.getValor());
-//                case d -> calculateDebit(user, request);
-//            };
-//        });
-//    }
-//
-//    private Mono<Long> calculateDebit(final User user, final CreateTransactionRequest request) {
-//        if(user.getSaldo() + user.getLimite() < request.getValor()) {
-//            return Mono.error(new InvalidTransactionException(
-//                    "Saldo insuficiente",
-//                    HttpStatus.UNPROCESSABLE_ENTITY.value(),
-//                    HttpStatus.UNPROCESSABLE_ENTITY
-//            ));
-//        }
-//
-//        return Mono.just(DEBIT_OPERATION * request.getValor());
-//    }
-
-    private Mono<Long> calculateTransactionAmount(final User user, final CreateTransactionRequest request) {
-        if(TransactionType.d.name().equals(request.getTipo()) && user.getSaldo() + user.getLimite() < request.getValor()) {
-            return Mono.error(new InvalidTransactionException(
+    private void validBalanceToDebitTransaction(User user, CreateTransactionRequest request) {
+        log.info("==== Validando se o usuário [{}] possui saldo suficiente para realizar o débito do valor [{}]", user.getId(), request.getValor());
+        if(user.getSaldo() + user.getLimite() < request.getValor()) {
+            throw new InvalidTransactionException(
                     "Saldo insuficiente",
                     HttpStatus.UNPROCESSABLE_ENTITY.value(),
                     HttpStatus.UNPROCESSABLE_ENTITY
-            ));
+            );
         }
+    }
 
-        return TransactionType.d.name().equals(request.getTipo()) ? Mono.just(DEBIT_OPERATION * request.getValor()) : Mono.just(request.getValor());
+    private Long calculateNewUserBalance(final User user, final CreateTransactionRequest request) {
+        log.info("==== Calculando novo saldo do usuário [{}]", user.getId());
+        return TransactionType.d.name().equals(request.getTipo()) ? user.getSaldo() + (DEBIT_OPERATION * request.getValor()) : user.getSaldo() + request.getValor();
     }
 }

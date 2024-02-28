@@ -1,11 +1,18 @@
 package com.project.concurrence.control.repository;
 
 import com.project.concurrence.control.model.User;
-import reactor.core.publisher.Mono;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository {
+import java.util.Optional;
 
-    Mono<User> findById(final Long userId);
-    Mono<User> updateUser(final User user, final Long amount);
-    Mono<User> findByIdForUpdate(final Long userId);
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT u FROM User u WHERE u.id = :id")
+    Optional<User> findUserByIdToUpdateBalance(Long id);
 }

@@ -6,6 +6,6 @@ import com.project.concurrence.control.controller.responses.TransactionHistoricR
 import reactor.core.publisher.Mono;
 
 public interface TransactionService {
-    Mono<CreateTransactionResponse> createTransaction(final CreateTransactionRequest request, final Long id);
-    Mono<TransactionHistoricResponse> getBankStatements(final Long id);
+    Mono<CreateTransactionResponse> createTransaction(final Long id, final CreateTransactionRequest request);
+    Mono<TransactionHistoricResponse> getTransactionHistoric(final Long id);
 }

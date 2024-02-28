@@ -1,21 +1,20 @@
 package com.project.concurrence.control.controller.responses;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.concurrence.control.model.Transaction;
-import com.project.concurrence.control.model.enums.TransactionType;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-
-import java.time.LocalDateTime;
 
 public record TransactionResponse(
         Long valor,
         String descricao,
-        TransactionType tipo,
-        LocalDateTime realizada_em
+        String tipo,
+        @JsonProperty("realizada_em")
+        String realizadaEm
 ) {
 
     public static TransactionResponse of(final Transaction transaction) {
-        return new TransactionResponse(transaction.getValor(), transaction.getDescricao(), transaction.getTipo(), transaction.getCriadoEm());
+        return new TransactionResponse(transaction.getValor(), transaction.getDescricao(), transaction.getTipo(), transaction.getCriadoEm().toString());
     }
 
     @Override
@@ -24,7 +23,7 @@ public record TransactionResponse(
                 .append("valor", valor)
                 .append("tipo", tipo)
                 .append("descricao", descricao)
-                .append("realizada_em", realizada_em)
+                .append("realizada_em", realizadaEm)
                 .toString();
     }
 }

@@ -13,11 +13,7 @@ CREATE TABLE transactions (
 	valor INTEGER,
 	tipo VARCHAR(1),
 	descricao VARCHAR(10),
-	criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-	CONSTRAINT fk_users
-      FOREIGN KEY(user_id)
-        REFERENCES users(id)
+	criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 

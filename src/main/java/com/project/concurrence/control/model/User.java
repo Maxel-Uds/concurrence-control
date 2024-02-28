@@ -1,12 +1,13 @@
 package com.project.concurrence.control.model;
 
-import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -19,15 +20,14 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long saldo;
     private Long limite;
 
-    public User copyWithSaldo(final Long amount) {
+    public User copyWithNewBalance(final Long newBalance) {
         return User.builder()
                 .id(this.id)
-                .saldo(amount)
+                .saldo(newBalance)
                 .limite(this.limite)
                 .build();
     }

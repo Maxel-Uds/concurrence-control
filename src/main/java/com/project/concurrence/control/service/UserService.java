@@ -1,10 +1,9 @@
 package com.project.concurrence.control.service;
 
 import com.project.concurrence.control.model.User;
-import reactor.core.publisher.Mono;
 
 public interface UserService {
-    Mono<User> findById(final Long id);
-    Mono<User> updateUser(final User user, final Long amount);
-    Mono<User> findUserByIdToUpdateBalance(final Long id);
+    User findById(final Long id);
+    User updateUser(final User user);
+    User findUserByIdToUpdateBalance(final Long id);
 }

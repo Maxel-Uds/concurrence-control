@@ -1,10 +1,17 @@
 package com.project.concurrence.control.model;
 
 import com.project.concurrence.control.controller.requests.CreateTransactionRequest;
-import com.project.concurrence.control.model.enums.TransactionType;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.Accessors;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -24,8 +31,7 @@ public class Transaction {
     private Long userId;
     private Long valor;
     private String descricao;
-    @Enumerated(EnumType.STRING)
-    private TransactionType tipo;
+    private String tipo;
     @Column(insertable = false)
     private LocalDateTime criadoEm;
 
@@ -44,7 +50,7 @@ public class Transaction {
                 .userId(user.getId())
                 .valor(request.getValor())
                 .descricao(request.getDescricao())
-                .tipo(TransactionType.valueOf(request.getTipo()))
+                .tipo(request.getTipo())
                 .build();
     }
 

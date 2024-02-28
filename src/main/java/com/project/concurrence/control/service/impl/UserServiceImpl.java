@@ -1,41 +1,50 @@
 package com.project.concurrence.control.service.impl;
 
+import com.project.concurrence.control.exception.UserNotFoundException;
 import com.project.concurrence.control.model.User;
 import com.project.concurrence.control.repository.UserRepository;
 import com.project.concurrence.control.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
 
     @Override
-    public Mono<User> findUserByIdToUpdateBalance(final Long id) {
-        return this.repository.findByIdForUpdate(id)
-                .doOnError(throwable -> log.info("=== Erro ao buscar usuário: [{}]", throwable.getMessage()))
-                .doFirst(() -> log.info("=== Buscando usúario [{}]", id));
+    public User findUserByIdToUpdateBalance(final Long id) {
+        log.info("==== Buscando usuário [{}] para atualizar saldo", id);
+        return userRepository.findUserByIdToUpdateBalance(id)
+                .orElseThrow(() -> new UserNotFoundException(
+                        String.format("Nenhum usuário encontrado com o id [%s]", id),
+                        HttpStatus.NOT_FOUND.value(),
+                        HttpStatus.NOT_FOUND
+                ));
     }
 
     @Override
-    public Mono<User> findById(final Long id) {
-        return this.repository.findById(id)
-                .doOnError(throwable -> log.info("=== Erro ao buscar usuário: [{}]", throwable.getMessage()))
-                .doFirst(() -> log.info("=== Buscando usúario [{}]", id));
+    public User findById(final Long id) {
+        log.info("==== Buscando usuário [{}]", id);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(
+                        String.format("Nenhum usuário encontrado com o id [%s]", id),
+                        HttpStatus.NOT_FOUND.value(),
+                        HttpStatus.NOT_FOUND
+                ));
     }
 
     @Override
-    public Mono<User> updateUser(final User user, final Long amount) {
-        return this.repository.updateUser(user, amount)
-                .doOnSuccess(resp -> log.info("=== Usuário atualizado com sucesso [{}]", user))
-                .doOnError(throwable -> log.info("=== Erro ao atualizar usuário: [{}]", throwable.getMessage()))
-                .doFirst(() -> log.info("=== Atualizando usúario [{}]", user));
+    public User updateUser(User user) {
+        log.info("==== Atualizando usuário [{}]", user.getId());
+        return this.userRepository.save(user);
     }
 
 
