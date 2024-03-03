@@ -15,11 +15,11 @@ services:
     # são automaticamente executados quando o contêiner é iniciado pela primeira vez.
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: "0.25"
-#          memory: "60MB"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.7"
+          memory: "120MB"
     networks:
       - default
   api01: &api
@@ -34,11 +34,11 @@ services:
       - "8081:8080"
     depends_on:
       - db_postgres
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: "0.55"
-#          memory: "200MB"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "200MB"
     networks:
       - default
 
@@ -59,11 +59,11 @@ services:
       - api02
     ports:
       - "9999:9999"
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: "0.15"
-#          memory: "60MB"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "30MB"
     networks:
       - default
 

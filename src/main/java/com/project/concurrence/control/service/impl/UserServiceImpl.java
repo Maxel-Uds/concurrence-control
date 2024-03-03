@@ -9,9 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-import java.util.Optional;
-
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -33,7 +30,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findById(final Long id) {
         log.info("==== Buscando usuário [{}]", id);
-        return userRepository.findById(id)
+        return this.userRepository.findUserById(id)
                 .orElseThrow(() -> new UserNotFoundException(
                         String.format("Nenhum usuário encontrado com o id [%s]", id),
                         HttpStatus.NOT_FOUND.value(),
@@ -44,7 +41,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(User user) {
         log.info("==== Atualizando usuário [{}]", user.getId());
-        return this.userRepository.save(user);
+        return this.userRepository.update(user);
     }
 
 

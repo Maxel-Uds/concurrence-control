@@ -30,33 +30,29 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserService userService;
     private final TransactionRepository transactionRepository;
 
+    public Mono<TransactionHistoricResponse> getTransactionHistoric(Long userId) {
+        User user = this.userService.findById(userId);
 
-    public Mono<TransactionHistoricResponse> getTransactionHistoric(Long id) {
-        User user = this.userService.findById(id);
+        List<TransactionResponse> transactions = this.transactionRepository.findTop10ByUserIdOrderByCriadoEmDesc(userId)
+                .stream().map(TransactionResponse::of)
+                .toList();
 
-        log.info("==== Buscando extrato do user [{}]", id);
-        List<TransactionResponse> transactions = this.transactionRepository.findTop10ByUserIdOrderByCriadoEmDesc(id)
-                .stream().map(TransactionResponse::of).toList();
-
-        log.info("==== Extrato encontrado {}", transactions);
         return Mono.just(TransactionHistoricResponse.of(user, transactions));
     }
 
     @Transactional
-    public Mono<CreateTransactionResponse> createTransaction(Long id, CreateTransactionRequest request) {
-        User user = this.userService.findUserByIdToUpdateBalance(id);
+    public Mono<CreateTransactionResponse> createTransaction(Long userId, CreateTransactionRequest request) {
+        User user = this.userService.findUserByIdToUpdateBalance(userId);
 
         if(request.getTipo().equals(TransactionType.d.name())) this.validBalanceToDebitTransaction(user, request);
 
-        Long newUserBalance = calculateNewUserBalance(user, request);
+        Long newBalance = calculateNewUserBalance(user, request);
 
-        log.info("==== Salvando transação [{}] do usuário [{}]", request, user.getId());
-        transactionRepository.save(Transaction.toEntity(request, user));
+        this.transactionRepository.save(Transaction.toEntity(request, user));
 
-        User updatedUser = userService.updateUser(user.copyWithNewBalance(newUserBalance));
+        user = this.userService.updateUser(user.copyWithNewBalance(newBalance));
 
-        log.info("==== Transação realizada com sucesso");
-        return Mono.just(CreateTransactionResponse.of(updatedUser));
+        return Mono.just(CreateTransactionResponse.of(user));
     }
 
     private void validBalanceToDebitTransaction(User user, CreateTransactionRequest request) {
