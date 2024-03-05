@@ -4,7 +4,7 @@ import com.project.concurrence.control.controller.requests.CreateTransactionRequ
 import com.project.concurrence.control.controller.responses.CreateTransactionResponse;
 import com.project.concurrence.control.controller.responses.TransactionHistoricResponse;
 import com.project.concurrence.control.service.TransactionService;
-import jakarta.validation.Valid;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
+
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -24,6 +26,7 @@ public class TransactionController {
     private final TransactionService service;
 
     @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value="Realiza uma transação")
     @PostMapping(value = "/clientes/{id}/transacoes")
     public Mono<CreateTransactionResponse> createTransaction(@RequestBody @Valid final CreateTransactionRequest request, @PathVariable(value = "id") final Long id) {
         return service.createTransaction(id, request)
@@ -34,6 +37,7 @@ public class TransactionController {
     }
 
     @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value="Busca as 10 últimas transações")
     @GetMapping(value = "/clientes/{id}/extrato")
     public Mono<TransactionHistoricResponse> getTransactionHistoric(@PathVariable(value = "id") final Long id) {
         return service.getTransactionHistoric(id)
