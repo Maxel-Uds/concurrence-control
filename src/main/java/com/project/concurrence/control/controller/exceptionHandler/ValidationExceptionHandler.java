@@ -103,18 +103,6 @@ public class ValidationExceptionHandler {
                 .build();
     }
 
-    private ErrorResponse badRequestResponseOf(RuntimeException exception, ServerHttpRequest request){
-        log.error("==== Error: [{}]. Path: [{}]. Method: [{}]. Code: [{}] ====", exception.getMessage(), request.getURI().getPath(), request.getMethod(), HttpStatus.BAD_REQUEST.value());
-        return ErrorResponse
-                .builder()
-                .message(exception.getMessage())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .timestamp(System.currentTimeMillis())
-                .path(request.getURI().getPath())
-                .error(HttpStatus.BAD_REQUEST.name().toLowerCase())
-                .build();
-    }
-
     private ErrorResponse invalidAmountTransactionResponseOf(InvalidAmountTransactionException exception, ServerHttpRequest request){
         log.error("==== Error: [{}]. Path: [{}]. Method: [{}]. Code: [{}] ====", exception.getMessage(), request.getURI().getPath(), request.getMethod(), exception.getCode());
         return ErrorResponse

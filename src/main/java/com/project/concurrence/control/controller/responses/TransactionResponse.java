@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 public record TransactionResponse(
-        Long valor,
+        long valor,
         String descricao,
         String tipo,
         @JsonProperty("realizada_em")

@@ -17,9 +17,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Transaction {
-    private Long id;
-    private Long userId;
-    private Long valor;
+    private long id;
+    private long userId;
+    private long valor;
     private String descricao;
     private String tipo;
     private String criadoEm;

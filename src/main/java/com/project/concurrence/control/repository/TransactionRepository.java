@@ -7,5 +7,5 @@ import java.util.List;
 public interface TransactionRepository {
 
     Transaction save(final Transaction transaction);
-    List<Transaction> findTop10ByUserIdOrderByCriadoEmDesc(final Long userId);
+    List<Transaction> findTop10ByUserIdOrderByCriadoEmDesc(final long userId);
 }

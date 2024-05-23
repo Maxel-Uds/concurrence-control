@@ -17,7 +17,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User findUserByIdToUpdateBalance(final Long id) {
+    public User findUserByIdToUpdateBalance(final long id) {
         log.info("==== Buscando usuário [{}] para atualizar saldo", id);
         return userRepository.findUserByIdToUpdateBalance(id)
                 .orElseThrow(() -> new UserNotFoundException(
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(final Long id) {
+    public User findById(final long id) {
         log.info("==== Buscando usuário [{}]", id);
         return this.userRepository.findUserById(id)
                 .orElseThrow(() -> new UserNotFoundException(

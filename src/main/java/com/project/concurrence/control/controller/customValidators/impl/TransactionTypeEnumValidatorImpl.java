@@ -2,10 +2,10 @@ package com.project.concurrence.control.controller.customValidators.impl;
 
 import com.project.concurrence.control.controller.customValidators.EnumValidator;
 import com.project.concurrence.control.exception.InvalidEnumTypeException;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.http.HttpStatus;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

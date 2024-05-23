@@ -1,4 +1,4 @@
-FROM gradle:latest AS build
+FROM gradle:jdk17 AS build
 RUN mkdir /src
 COPY . /src
 WORKDIR /src

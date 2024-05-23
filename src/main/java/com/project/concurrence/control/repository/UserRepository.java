@@ -7,6 +7,6 @@ import java.util.Optional;
 public interface UserRepository {
 
     User update(final User user);
-    Optional<User> findUserById(final Long id);
-    Optional<User> findUserByIdToUpdateBalance(final Long id);
+    Optional<User> findUserById(final long id);
+    Optional<User> findUserByIdToUpdateBalance(final long id);
 }

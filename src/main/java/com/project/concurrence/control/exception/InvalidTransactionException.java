@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public class InvalidTransactionException extends RuntimeException {
-    private final Integer code;
+    private final int code;
     private final HttpStatus status;
 
-    public InvalidTransactionException(String message, Integer code, HttpStatus status) {
+    public InvalidTransactionException(String message, int code, HttpStatus status) {
         super(message);
         this.code = code;
         this.status = status;

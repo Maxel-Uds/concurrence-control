@@ -12,8 +12,4 @@ import java.util.List;
 public class ValidationErrorResponse extends ErrorResponse {
 
     private List<FieldMessage> errors;
-
-    public void addError(String fieldName, String message){
-        errors.add(new FieldMessage(fieldName, message));
-    }
 }

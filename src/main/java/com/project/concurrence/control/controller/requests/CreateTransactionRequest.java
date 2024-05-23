@@ -3,6 +3,8 @@ package com.project.concurrence.control.controller.requests;
 import com.project.concurrence.control.controller.customValidators.EnumValidator;
 import com.project.concurrence.control.controller.customValidators.LongValueValidator;
 import com.project.concurrence.control.model.enums.TransactionType;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,9 +12,6 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.hibernate.validator.constraints.Length;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Positive;
 
 @Getter
 @Builder
@@ -38,7 +37,7 @@ public class CreateTransactionRequest {
                 .toString();
     }
 
-    public Long getValor() {
+    public long getValor() {
         return Long.parseLong(valor);
     }
 }

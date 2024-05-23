@@ -27,7 +27,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findUserById(Long id) {
+    public Optional<User> findUserById(long id) {
         return this.jdbcTemplate.query(
                     "SELECT id, limite, saldo FROM users WHERE id = ?", new Object[]{id},
                     (rs, rowNum) -> new User(rs.getLong("id"), rs.getLong("saldo"), rs.getLong("limite"))
@@ -36,7 +36,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findUserByIdToUpdateBalance(Long id) {
+    public Optional<User> findUserByIdToUpdateBalance(long id) {
         return this.jdbcTemplate.query(
                     "SELECT id, limite, saldo FROM users WHERE id = ? FOR UPDATE", new Object[]{id},
                     (rs, rowNum) -> new User(rs.getLong("id"), rs.getLong("saldo"), rs.getLong("limite"))

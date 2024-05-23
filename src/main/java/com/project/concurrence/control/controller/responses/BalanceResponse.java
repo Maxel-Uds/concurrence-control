@@ -8,8 +8,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import java.time.LocalDateTime;
 
 public record BalanceResponse(
-        Long limite,
-        Long total,
+        long limite,
+        long total,
         @JsonProperty("data_extrato")
         LocalDateTime dataExtrato
 ) {

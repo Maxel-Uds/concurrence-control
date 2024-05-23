@@ -14,9 +14,9 @@ import com.project.concurrence.control.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -25,34 +25,34 @@ import java.util.List;
 @AllArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
-    private static final Long DEBIT_OPERATION = -1L;
+    private static final long DEBIT_OPERATION = -1L;
 
     private final UserService userService;
     private final TransactionRepository transactionRepository;
 
-    public Mono<TransactionHistoricResponse> getTransactionHistoric(Long userId) {
+    public ResponseEntity<TransactionHistoricResponse> getTransactionHistoric(long userId) {
         User user = this.userService.findById(userId);
 
         List<TransactionResponse> transactions = this.transactionRepository.findTop10ByUserIdOrderByCriadoEmDesc(userId)
                 .stream().map(TransactionResponse::of)
                 .toList();
 
-        return Mono.just(TransactionHistoricResponse.of(user, transactions));
+        return ResponseEntity.ok(TransactionHistoricResponse.of(user, transactions));
     }
 
     @Transactional
-    public Mono<CreateTransactionResponse> createTransaction(Long userId, CreateTransactionRequest request) {
+    public ResponseEntity<CreateTransactionResponse> createTransaction(long userId, CreateTransactionRequest request) {
         User user = this.userService.findUserByIdToUpdateBalance(userId);
 
         if(request.getTipo().equals(TransactionType.d.name())) this.validBalanceToDebitTransaction(user, request);
 
-        Long newBalance = calculateNewUserBalance(user, request);
+        long newBalance = calculateNewUserBalance(user, request);
 
         this.transactionRepository.save(Transaction.toEntity(request, user));
 
         user = this.userService.updateUser(user.copyWithNewBalance(newBalance));
 
-        return Mono.just(CreateTransactionResponse.of(user));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CreateTransactionResponse.of(user));
     }
 
     private void validBalanceToDebitTransaction(User user, CreateTransactionRequest request) {
@@ -66,7 +66,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
-    private Long calculateNewUserBalance(final User user, final CreateTransactionRequest request) {
+    private long calculateNewUserBalance(final User user, final CreateTransactionRequest request) {
         log.info("==== Calculando novo saldo do usuário [{}]", user.getId());
         return TransactionType.d.name().equals(request.getTipo()) ? user.getSaldo() + (DEBIT_OPERATION * request.getValor()) : user.getSaldo() + request.getValor();
     }

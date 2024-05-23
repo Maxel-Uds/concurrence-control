@@ -5,8 +5,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 public record CreateTransactionResponse(
-        Long limite,
-        Long saldo
+        long limite,
+        long saldo
 ) {
 
     public static CreateTransactionResponse of(final User user) {

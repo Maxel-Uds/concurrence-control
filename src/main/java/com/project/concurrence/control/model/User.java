@@ -14,11 +14,11 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    private Long id;
-    private Long saldo;
-    private Long limite;
+    private long id;
+    private long saldo;
+    private long limite;
 
-    public User copyWithNewBalance(final Long newBalance) {
+    public User copyWithNewBalance(final long newBalance) {
         return User.builder()
                 .id(this.id)
                 .saldo(newBalance)

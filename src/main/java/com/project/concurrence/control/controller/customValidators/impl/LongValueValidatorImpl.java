@@ -2,10 +2,9 @@ package com.project.concurrence.control.controller.customValidators.impl;
 
 import com.project.concurrence.control.controller.customValidators.LongValueValidator;
 import com.project.concurrence.control.exception.InvalidAmountTransactionException;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.http.HttpStatus;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class LongValueValidatorImpl implements ConstraintValidator<LongValueValidator, String> {
 

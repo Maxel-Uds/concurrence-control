@@ -10,8 +10,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class ErrorResponse {
 
-    private final Long timestamp;
-    private final Integer status;
+    private final long timestamp;
+    private final int status;
     private final String message;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private final String error;

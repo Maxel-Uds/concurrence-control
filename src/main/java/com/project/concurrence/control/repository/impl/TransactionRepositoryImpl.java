@@ -27,7 +27,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public List<Transaction> findTop10ByUserIdOrderByCriadoEmDesc(Long userId) {
+    public List<Transaction> findTop10ByUserIdOrderByCriadoEmDesc(long userId) {
         log.info("==== Buscando extrato do user [{}]", userId);
         return this.jdbcTemplate.query(
                 "SELECT t.id, t.user_id, t.valor, t.tipo, t.descricao, t.criado_em FROM transactions as t WHERE t.user_id = ? ORDER BY t.criado_em DESC LIMIT 10",

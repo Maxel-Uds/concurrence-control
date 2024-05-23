@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public class UserNotFoundException extends RuntimeException {
-    private final Integer code;
+    private final int code;
     private final HttpStatus status;
 
-    public UserNotFoundException(String message, Integer code, HttpStatus status) {
+    public UserNotFoundException(String message, int code, HttpStatus status) {
         super(message);
         this.code = code;
         this.status = status;

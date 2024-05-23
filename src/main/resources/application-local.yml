@@ -1,12 +1,15 @@
 server:
   port: 8080
+  servlet:
+    context-path: /v1/concurrence-control
 
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   config:
     activate:
       on-profile: local
-  webflux:
-    base-path: /concurrence-control/v1
   datasource:
     url: "jdbc:postgresql://localhost:5433/bank"
     username: "postgres"
