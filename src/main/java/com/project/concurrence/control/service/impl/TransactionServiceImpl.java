@@ -52,7 +52,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         user = this.userService.updateUser(user.copyWithNewBalance(newBalance));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(CreateTransactionResponse.of(user));
+        return ResponseEntity.ok(CreateTransactionResponse.of(user));
     }
 
     private void validBalanceToDebitTransaction(User user, CreateTransactionRequest request) {
