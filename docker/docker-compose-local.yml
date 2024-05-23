@@ -1,0 +1,73 @@
+version: "3.5"
+
+services:
+  db_postgres:
+    image: postgres:latest
+    container_name: db_postgres
+    hostname: db_postgres
+    environment:
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=bank
+    ports:
+      - "5433:5432"
+    # O diretório /docker-entrypoint-initdb.d/ é especial, todos os scripts SQL presentes nesse diretório
+    # são automaticamente executados quando o contêiner é iniciado pela primeira vez.
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "80MB"
+    networks:
+      - default
+  api01: &api
+    image: concurrence-control-local:latest
+    container_name: api1
+    hostname: api01
+    environment:
+      - POSTGRES_DB_URL=jdbc:postgresql://db_postgres:5432/bank
+      - POSTGRES_DB_USER=postgres
+      - POSTGRES_DB_PASS=12345678
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db_postgres
+    deploy:
+      resources:
+        limits:
+          cpus: "0.55"
+          memory: "230MB"
+    networks:
+      - default
+
+  api02:
+    <<: *api
+    hostname: api02
+    container_name: api2
+    ports:
+      - "8082:8080"
+
+  nginx:
+    image: nginx:latest
+    container_name: load_balancer
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api01
+      - api02
+    ports:
+      - "9999:9999"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: "10MB"
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
+    name: default-network
